@@ -1,6 +1,6 @@
 import { MongoClient } from "mongodb";
 import Quiz, { UserQuiz } from "../business/models/Quiz";
-import Question from "../business/models/Question";
+import IQuestion from "../business/models/IQuestion";
 import Student from "../business/models/Student";
 import IGetQuizData from "../business/interfaces/IGetQuizData";
 import IGetQuestionData from "../business/interfaces/IGetQuestionData";
@@ -9,6 +9,8 @@ import IGetQuestionData from "../business/interfaces/IGetQuestionData";
  * Concrete class that implements IGetQuizData and serves up data from MongoDB
  */
 export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
+  uri = process.env.MONGODB_URI ??"";
+
   async findQuiz(id: string) {
     const client = new MongoClient(this.uri);
     var quiz: Quiz | null = null;
@@ -101,8 +103,8 @@ export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
   }
 
   async findQuestion(qid: number) {
-    const client = new MongoClient(uri);
-    var question: Question | null = null;
+    const client = new MongoClient(this.uri);
+    var question: IQuestion | null = null;
     try {
       await client.connect();
 
@@ -122,9 +124,9 @@ export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
   }
 
   async findQuestionAnswer(qid: number) {
-    const client = new MongoClient(uri);
-    var question: Question | null = null;
-    var answer: string;
+    const client = new MongoClient(this.uri);
+    var question: IQuestion | null = null;
+    var answer: string = "";
     try {
       await client.connect();
 
@@ -135,7 +137,7 @@ export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
 
       const result = await questions.findOne(query);
       question = JSON.parse(JSON.stringify(result));
-      answer = question?.answer;
+      answer = question?.answer??"";
 
     } catch (err) {
       console.error(err);
@@ -146,10 +148,10 @@ export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
   }
 
   async findQuestionType(qid: number) {
-    const client = new MongoClient(uri);
+    const client = new MongoClient(this.uri);
     
-    var question: Question | null = null;
-    var type: string;
+    var question: IQuestion | null = null;
+    var type: string = "";
     try {
       await client.connect();
 
@@ -160,7 +162,7 @@ export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
 
       const result = await questions.findOne(query);
       question = JSON.parse(JSON.stringify(result));
-      type = question?.type;
+      type = question?.type??"";
       
     } catch (err) {
       console.error(err);
