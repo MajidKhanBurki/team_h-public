@@ -1,14 +1,14 @@
 import { MongoClient } from "mongodb";
 import Quiz, { UserQuiz } from "../business/models/Quiz";
+import Question from "../business/models/Question";
 import Student from "../business/models/Student";
 import IGetQuizData from "../business/interfaces/IGetQuizData";
+import IGetQuestionData from "../business/interfaces/IGetQuestionData";
 
 /*
  * Concrete class that implements IGetQuizData and serves up data from MongoDB
  */
-export default class MongoQuizData implements IGetQuizData {
-  uri = process.env.MONGODB_URI ?? "";
-
+export default class MongoQuizData implements IGetQuizData, IGetQuestionData {
   async findQuiz(id: string) {
     const client = new MongoClient(this.uri);
     var quiz: Quiz | null = null;
@@ -97,6 +97,76 @@ export default class MongoQuizData implements IGetQuizData {
     } finally {
       await client.close();
       return userQuizzes;
+    }
+  }
+
+  async findQuestion(qid: number) {
+    const client = new MongoClient(uri);
+    var question: Question | null = null;
+    try {
+      await client.connect();
+
+      const database = client.db("test");
+      const questions = database.collection("questions");
+
+      const query = { qid: qid };
+
+      const result = await questions.findOne(query);
+      question = JSON.parse(JSON.stringify(result));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await client.close();
+      return question;
+    }
+  }
+
+  async findQuestionAnswer(qid: number) {
+    const client = new MongoClient(uri);
+    var question: Question | null = null;
+    var answer: string;
+    try {
+      await client.connect();
+
+      const database = client.db("test");
+      const questions = database.collection("questions");
+
+      const query = { subject: qid };
+
+      const result = await questions.findOne(query);
+      question = JSON.parse(JSON.stringify(result));
+      answer = question?.answer;
+
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await client.close();
+      return answer;
+    }
+  }
+
+  async findQuestionType(qid: number) {
+    const client = new MongoClient(uri);
+    
+    var question: Question | null = null;
+    var type: string;
+    try {
+      await client.connect();
+
+      const database = client.db("test");
+      const questions = database.collection("questions");
+
+      const query = { subject: qid };
+
+      const result = await questions.findOne(query);
+      question = JSON.parse(JSON.stringify(result));
+      type = question?.type;
+      
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await client.close();
+      return type;
     }
   }
 }
