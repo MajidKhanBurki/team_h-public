@@ -80,6 +80,7 @@ describe("MongoQuizData", () => {
     });
   });
 
+  
   describe("findQuizzesTakenByUser", () => {
     it("should return an array of UserQuiz objects when given a valid user name", async () => {
       const userQuizzes = await quizData.findQuizzesTakenByUser("John");
@@ -93,4 +94,74 @@ describe("MongoQuizData", () => {
       expect(userQuizzes[1].marks).to.deep.equal(90);
     });
   });
+
+  describe('findQuestion', () => {
+  
+    it('should return null when no question is found', async () => {
+      const qid = 1234;
+      const question = await quizData.findQuestion(qid);
+      expect(question).to.be.null;
+    });
+  
+    it('should return the question when found', async () => {
+      const qid = 5678;
+      const questionData = { qid, question: 'What is the capital of  Canada?', answer: "Ottawa",subject: "Geography" ,type:"SingleAnswer"  };
+      const questions = client.db('test').collection('questions');
+      await questions.insertOne(questionData);
+  
+      const question = await quizData.findQuestion(qid);
+      expect(question).to.deep.equal(questionData);
+    });
+  });
+
+  describe('findQuestionAnswer', () => {
+  
+    it('should return an empty string when no question is found', async () => {
+      const qid = 'nonexistent-subject';
+      const answer = await quizData.findQuestionAnswer(qid);
+      expect(answer).to.equal('');
+    });
+  
+    it('should return the answer when a question is found', async () => {
+      const subject = 'Geography';
+      const questionData = {
+        qid: 1234,
+        question: 'What is the capital of Canada?',
+        answer: 'Ottawa',
+        subject,
+        type: 'SingleAnswer',
+      };
+      const questions = client.db('test').collection('questions');
+      await questions.insertOne(questionData);
+  
+      const answer = await quizData.findQuestionAnswer(subject);
+      expect(answer).to.equal(questionData.answer);
+    });
+  });
+
+  describe('findQuestionType', () => {
+  
+    it('should return an empty string when no question is found', async () => {
+      const qid = 'nonexistent-subject';
+      const type = await quizData.findQuestionType(qid);
+      expect(type).to.equal('');
+    });
+  
+    it('should return the type when a question is found', async () => {
+      const subject = 'Geography';
+      const questionData = {
+        qid: 1234,
+        question: 'What is the Capital of Canada?',
+        answer: 'Ottawa',
+        subject,
+        type: 'SingleAnswer',
+      };
+      const questions = client.db('test').collection('questions');
+      await questions.insertOne(questionData);
+  
+      const type = await quizData.findQuestionType(subject);
+      expect(type).to.equal(questionData.type);
+    });
+  });
+
 });
