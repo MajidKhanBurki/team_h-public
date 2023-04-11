@@ -11,6 +11,7 @@ import { Box,useColorModeValue,SimpleGrid,Button,Image,chakra,Stack } from "@cha
 import { MdSupervisorAccount, MdPerson, MdAppRegistration } from 'react-icons/md'
 import type { NextPage } from "next";
 import PasswordCheck from '../src/business/validation/passCheck'
+import  EmailCheck  from "../src/business/validation/emailCheck";
 import { useEffect } from "react";
 import { useSession } from "next-auth/react";
 /**
@@ -40,8 +41,18 @@ const signUp: NextPage = () => {
         const confirmPassword: string = e.target.confirmPassword.value;
         const role: string = e.target.role.value;
         let passcheck = new PasswordCheck(password)
+        let allowedDomains: string[] = ["mun.ca"];
+        let blockedDomains:string[] = ["gmail.com","yahoo.com","hotmail.com"];
+        let requireOrganizationEmail:boolean = true;
 
-        if (password !== confirmPassword){
+        let options = {
+            allowedDomains,
+            blockedDomains,
+            requireOrganizationEmail
+        }
+        let emailCheck = new EmailCheck(allowedDomains,blockedDomains,requireOrganizationEmail);
+
+          if (password !== confirmPassword){
             toast({
                 title: "Error",
                 description: "Both the passwords are not same",
@@ -61,6 +72,17 @@ const signUp: NextPage = () => {
                 isClosable: true,
                 colorScheme: "gray",
             });
+        }
+
+        if(emailCheck.isValidEmail(email,options).passCases == false){
+            toast({
+                title: "Error",
+                description: emailCheck.isValidEmail(email,options).errorMessage,
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                colorScheme: "gray",
+              });
         }
 
         else {
