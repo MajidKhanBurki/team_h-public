@@ -34,7 +34,7 @@ export default class EmailCheck implements EmailValidationOptions {
 
         // Check for required organization email
         if (requireOrganizationEmail && !this.isOrganizationEmail(email, allowedDomains)) {
-            errorMessage = "Incorrect Organization Email";
+            errorMessage = "Incorrect Organization Email. Supported organization is 'mun.ca'";
             passCases = false;
         }
 

@@ -74,7 +74,7 @@ const signUp: NextPage = () => {
             });
         }
 
-        if(emailCheck.isValidEmail(email,options).passCases == false){
+        else if(emailCheck.isValidEmail(email,options).passCases == false){
             toast({
                 title: "Error",
                 description: emailCheck.isValidEmail(email,options).errorMessage,
