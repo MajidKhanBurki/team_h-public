@@ -5,7 +5,7 @@ const { expect } = chai;
 
 import MongoQuizData from "../src/data/dbconnection";
 import QuizDataService from "../src/business/services/dbservice";
-import Quiz, { AdminQuizList } from "../src/business/models/Quiz";
+import Quiz, { AdminQuizList, UserQuiz } from "../src/business/models/Quiz";
 
 chai.use(sinonChai);
 
@@ -80,24 +80,42 @@ describe("QuizDataService", () => {
       mongoQuizDataStub.findAllQuizzesWithQuizTakersCount.resolves(mockResult);
 
       await quizDataService.findAllQuizzesWithQuizTakersCount();
+
       expect(mongoQuizDataStub.findAllQuizzesWithQuizTakersCount.called).to.be
         .true;
     });
   });
 
-  //   describe("findQuizzesTakenByUser", () => {
-  //     it("should call findQuizzesTakenByUser with the correct name", async () => {
-  //       const name = "John Doe";
-  //       await quizDataService.findQuizzesTakenByUser(name);
-  //       expect(mongoQuizData.findQuizzesTakenByUser.calledWith(name)).to.be.true;
-  //     });
-  //   });
+  describe("findQuizzesTakenByUser", () => {
+    it("should call findQuizzesTakenByUser with the correct name", async () => {
+      const name = "John Doe";
+      const mockResult = new Array<UserQuiz>();
+      // Stub the findQuizzesTakenByUser method and return a predefined result
+      mongoQuizDataStub.findQuizzesTakenByUser.resolves(mockResult);
 
-  //   describe("findQuestion", () => {
-  //     it("should call findQuestion with the correct qid", async () => {
-  //       const qid = 123;
-  //       await quizDataService.findQuestion(qid);
-  //       expect(mongoQuizData.findQuestion.calledWith(qid)).to.be.true;
-  //     });
-  //   });
+      await quizDataService.findQuizzesTakenByUser(name);
+
+      expect(mongoQuizDataStub.findQuizzesTakenByUser.calledWith(name)).to.be
+        .true;
+    });
+  });
+
+  describe("findQuestion", () => {
+    it("should call findQuestion with the correct qid", async () => {
+      const qid = 123;
+      const mockResult = {
+        qid: 0,
+        question: "string",
+        answer: "string",
+        subject: "string",
+        type: "string",
+      };
+      // Stub the findQuestion method and return a predefined result
+      mongoQuizDataStub.findQuestion.resolves(mockResult);
+
+      await quizDataService.findQuestion(qid);
+
+      expect(mongoQuizDataStub.findQuestion.calledWith(qid)).to.be.true;
+    });
+  });
 });
