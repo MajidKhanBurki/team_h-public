@@ -6,72 +6,72 @@ import IGetUserData from "../../business/interfaces/IGetUserData";
 class QuizDataService
   implements IHandleQuizData, IGetQuestionData, IGetUserData
 {
-  #instance: QuizDataService;
-  #mongoQuizData: MongoQuizData;
+  private _instance: QuizDataService;
+  private _mongoQuizData: MongoQuizData;
   constructor() {
-    this.#mongoQuizData = new MongoQuizData();
+    this._mongoQuizData = new MongoQuizData();
   }
   get instance(): QuizDataService {
-    return this.#instance;
+    return this._instance;
   }
   set instance(i: QuizDataService) {
-    this.#instance = i;
+    this._instance = i;
   }
 
-  static getInstance(): QuizDataService {
-    if (!QuizDataService.instance) {
-      QuizDataService.instance = new QuizDataService();
+  static getSingleton(): QuizDataService {
+    if (!QuizDataService.prototype.instance) {
+      QuizDataService.prototype.instance = new QuizDataService();
     }
-    return QuizDataService.instance;
+    return QuizDataService.prototype.instance;
   }
 
   public async findQuiz(id: string) {
-    return this.#mongoQuizData.findQuiz(id);
+    return this._mongoQuizData.findQuiz(id);
   }
 
   public async deleteQuiz(subject: string) {
-    return this.#mongoQuizData.deleteQuiz(subject);
+    return this._mongoQuizData.deleteQuiz(subject);
   }
 
   async findAllQuizzes() {
-    return this.#mongoQuizData.findAllQuizzes();
+    return this._mongoQuizData.findAllQuizzes();
   }
 
   public async findAllQuizzesWithQuizTakersCount() {
-    return this.#mongoQuizData.findAllQuizzesWithQuizTakersCount();
+    return this._mongoQuizData.findAllQuizzesWithQuizTakersCount();
   }
 
   async findQuizzesTakenByUser(name: string) {
-    return this.#mongoQuizData.findQuizzesTakenByUser(name);
+    return this._mongoQuizData.findQuizzesTakenByUser(name);
   }
 
   async findQuestion(qid: number) {
-    return this.#mongoQuizData.findQuestion(qid);
+    return this._mongoQuizData.findQuestion(qid);
   }
 
   async unlinkQuestionFromQuiz(subject: string) {
-    return this.#mongoQuizData.unlinkQuestionFromQuiz(subject);
+    return this._mongoQuizData.unlinkQuestionFromQuiz(subject);
   }
 
   async findQuestionAnswer(qid: number) {
-    return this.#mongoQuizData.findQuestionAnswer(qid);
+    return this._mongoQuizData.findQuestionAnswer(qid);
   }
 
   async findQuestionType(qid: number) {
-    return this.#mongoQuizData.findQuestionType(qid);
+    return this._mongoQuizData.findQuestionType(qid);
   }
 
   async findUser(email: string) {
-    return this.#mongoQuizData.findUser(email);
+    return this._mongoQuizData.findUser(email);
   }
 
   async addUser(name: string, email: string, password: string, role: string) {
-    return this.#mongoQuizData.addUser(name, email, password, role);
+    return this._mongoQuizData.addUser(name, email, password, role);
   }
 
   async checkQuesAns(subject: string, question: string, userAns: string) {
-    return this.#mongoQuizData.checkQuesAns(subject, question, userAns);
+    return this._mongoQuizData.checkQuesAns(subject, question, userAns);
   }
 }
 
-export const QuizDataServiceInstance = QuizDataService.getInstance();
+export const QuizDataServiceInstance = QuizDataService.getSingleton();
