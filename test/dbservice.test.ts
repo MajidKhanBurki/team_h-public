@@ -4,7 +4,7 @@ import * as sinonChai from "sinon-chai";
 const { expect } = chai;
 
 import MongoQuizData from "../src/data/dbconnection";
-import QuizDataService from "../src/business/services/dbservice";
+import { QuizDataServiceInstance } from "../src/business/services/dbservice";
 import Quiz, { AdminQuizList, UserQuiz } from "../src/business/models/Quiz";
 
 chai.use(sinonChai);
@@ -13,17 +13,14 @@ chai.use(sinonChai);
 // sinon.defaultConfig = { ...sinon.defaultConfig, useFakeTimers: false };
 // sinon.assert.expose(expect, { prefix: "" });
 
-describe("QuizDataService", () => {
-  let quizDataService: QuizDataService;
+describe("QuizDataServiceInstance", () => {
   let mongoQuizDataStub: sinon.SinonStubbedInstance<MongoQuizData>;
 
   beforeEach(() => {
     // Create a stub for the MongoQuizData class methods
     mongoQuizDataStub = sinon.createStubInstance(MongoQuizData);
 
-    // Create a new instance of the QuizDataService class with the stubbed MongoQuizData instance
-    quizDataService = new QuizDataService();
-    quizDataService["mongoQuizData"] = mongoQuizDataStub; // use a private accessor to assign the stub instance
+    QuizDataServiceInstance["_mongoQuizData"] = mongoQuizDataStub; // use a private accessor to assign the stub instance
   });
 
   describe("findQuiz", () => {
@@ -35,7 +32,7 @@ describe("QuizDataService", () => {
       mongoQuizDataStub.findQuiz.resolves(expectedResult);
 
       // Call the method under test
-      const result = await quizDataService.findQuiz(id);
+      const result = await QuizDataServiceInstance.findQuiz(id);
 
       // Assert that the findQuiz method was called once with the expected argument
       expect(mongoQuizDataStub.findQuiz).to.have.been.calledWithExactly(id);
@@ -51,7 +48,7 @@ describe("QuizDataService", () => {
       mongoQuizDataStub.deleteQuiz.resolves();
 
       const subject = "test";
-      await quizDataService.deleteQuiz(subject);
+      await QuizDataServiceInstance.deleteQuiz(subject);
 
       expect(mongoQuizDataStub.deleteQuiz.calledWith(subject)).to.be.true;
     });
@@ -67,7 +64,7 @@ describe("QuizDataService", () => {
       // Stub the findAllQuizzes method and return a predefined result
       mongoQuizDataStub.findAllQuizzes.resolves(mockResult);
 
-      await quizDataService.findAllQuizzes();
+      await QuizDataServiceInstance.findAllQuizzes();
       expect(mongoQuizDataStub.findAllQuizzes.called).to.be.true;
     });
   });
@@ -79,7 +76,7 @@ describe("QuizDataService", () => {
       // Stub the findAllQuizzes method and return a predefined result
       mongoQuizDataStub.findAllQuizzesWithQuizTakersCount.resolves(mockResult);
 
-      await quizDataService.findAllQuizzesWithQuizTakersCount();
+      await QuizDataServiceInstance.findAllQuizzesWithQuizTakersCount();
 
       expect(mongoQuizDataStub.findAllQuizzesWithQuizTakersCount.called).to.be
         .true;
@@ -93,7 +90,7 @@ describe("QuizDataService", () => {
       // Stub the findQuizzesTakenByUser method and return a predefined result
       mongoQuizDataStub.findQuizzesTakenByUser.resolves(mockResult);
 
-      await quizDataService.findQuizzesTakenByUser(name);
+      await QuizDataServiceInstance.findQuizzesTakenByUser(name);
 
       expect(mongoQuizDataStub.findQuizzesTakenByUser.calledWith(name)).to.be
         .true;
@@ -113,9 +110,22 @@ describe("QuizDataService", () => {
       // Stub the findQuestion method and return a predefined result
       mongoQuizDataStub.findQuestion.resolves(mockResult);
 
-      await quizDataService.findQuestion(qid);
+      await QuizDataServiceInstance.findQuestion(qid);
 
       expect(mongoQuizDataStub.findQuestion.calledWith(qid)).to.be.true;
+    });
+  });
+
+  describe("unlinkQuestionFromQuiz", () => {
+    it("should call unlinkQuestionFromQuiz", async () => {
+      const subject: string = "Math";
+      // Stub the unlinkQuestionFromQuiz method and return a predefined result
+      mongoQuizDataStub.unlinkQuestionFromQuiz.resolves();
+
+      await QuizDataServiceInstance.unlinkQuestionFromQuiz(subject);
+
+      expect(mongoQuizDataStub.unlinkQuestionFromQuiz.calledWith(subject)).to.be
+        .true;
     });
   });
 });
