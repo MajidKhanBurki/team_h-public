@@ -15,7 +15,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import MongoQuizData from "../../../src/data/dbconnection";
+import { QuizDataServiceInstance } from "../../../src/business/services/dbservice";
 
 interface QuizBankProps {
   quizzes: Array<Quiz>;
@@ -23,13 +23,11 @@ interface QuizBankProps {
 
 export async function getServerSideProps() {
   try {
-
-    var qd = new MongoQuizData();
-    let quizzes = await qd.findAllQuizzes();
+    let quizzes = await QuizDataServiceInstance.findAllQuizzes();
 
     return {
       props: {
-        quiz: JSON.parse(JSON.stringify(quizzes))
+        quiz: JSON.parse(JSON.stringify(quizzes)),
       },
     };
   } catch (e) {
@@ -39,7 +37,7 @@ export async function getServerSideProps() {
 
 /**
  * Creating the QuizBank UI using reusable components
- * @returns 
+ * @returns
  */
 
 export default function QuizBank(quizzes: QuizBankProps) {
@@ -62,13 +60,15 @@ export default function QuizBank(quizzes: QuizBankProps) {
     if (role == "admin") {
       router.replace("/admin");
     } else if (role == "student") {
-
       return (
         <>
           <Head>
             <title>Quiz Bank</title>
             <meta name="description" content="Quiz App Home for students" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <meta
+              name="viewport"
+              content="width=device-width, initial-scale=1"
+            />
             <link rel="icon" href="/favicon.ico" />
             <link rel="stylesheet" href="../../../components/styles.css" />
           </Head>
@@ -78,8 +78,15 @@ export default function QuizBank(quizzes: QuizBankProps) {
               <Box justifyContent="center">
                 <Card />
               </Box>
-              <Box flex="1" width="80%" mx="auto" justifyContent="center" display={"inline-block"} marginTop={"10"}>
-                <QuizTable quizzes={quizzes}/>
+              <Box
+                flex="1"
+                width="80%"
+                mx="auto"
+                justifyContent="center"
+                display={"inline-block"}
+                marginTop={"10"}
+              >
+                <QuizTable quizzes={quizzes} />
               </Box>
               <Footer />
             </Box>

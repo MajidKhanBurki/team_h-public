@@ -12,7 +12,6 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { AdminQuizList } from "../../src/business/models/Quiz";
-import MongoQuizData from "../../src/data/dbconnection";
 import { QuizDataServiceInstance } from "../../src/business/services/dbservice";
 
 interface QuizBankProps {
@@ -21,7 +20,6 @@ interface QuizBankProps {
 
 export async function getServerSideProps() {
   try {
-    var qd = new MongoQuizData();
     let quizzes =
       await QuizDataServiceInstance.findAllQuizzesWithQuizTakersCount();
 

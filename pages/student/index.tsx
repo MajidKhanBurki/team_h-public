@@ -9,22 +9,22 @@ import UserQuiz from "../../src/business/models/Quiz";
 import { useSession, getSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import MongoQuizData from "../../src/data/dbconnection";
+import { QuizDataServiceInstance } from "../../src/business/services/dbservice";
 
 export async function getServerSideProps({ req }) {
   try {
     const session = await getSession({ req });
     const dbUser = session?.user?.name;
-    var qd = new MongoQuizData();
-    let quizzes: UserQuiz[] = (await qd.findQuizzesTakenByUser(dbUser)) ?? [
-      {
-        //dummy data in case the query returns nothing
-        id: 0,
-        name: "DummyQuizName",
-        subject: "DummySubject",
-        marks: 0,
-      } as UserQuiz,
-    ];
+    let quizzes: UserQuiz[] =
+      (await QuizDataServiceInstance.findQuizzesTakenByUser(dbUser)) ?? [
+        {
+          //dummy data in case the query returns nothing
+          id: 0,
+          name: "DummyQuizName",
+          subject: "DummySubject",
+          marks: 0,
+        } as UserQuiz,
+      ];
     return {
       props: { quizzes: JSON.parse(JSON.stringify(quizzes)) },
     };
@@ -49,7 +49,7 @@ export default function StudentHome({ quizzes }) {
 
   if (status === "authenticated") {
     var role: any = userRole(session);
-if (role == "admin") {
+    if (role == "admin") {
       router.replace("/admin");
     } else if (role == "student") {
       return (
