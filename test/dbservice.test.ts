@@ -217,4 +217,26 @@ describe("QuizDataServiceInstance", () => {
       ).to.be.true;
     });
   });
+
+  describe("getAuthorizedUser", () => {
+    it("should call getAuthorizedUser with the correct email and password", async () => {
+      const email = "adi@adi.com";
+      const password = "testpassword";
+
+      const mockResult = {
+        name: "string",
+        email: "string",
+        password: "string",
+        role: "string",
+        quizzes: [{ subject: "string", marks: 0 }],
+      } as Student;
+      // Stub the getAuthorizedUser method and return a predefined result
+      mongoQuizDataStub.getAuthorizedUser.resolves(mockResult);
+
+      await QuizDataServiceInstance.getAuthorizedUser(email, password);
+
+      expect(mongoQuizDataStub.getAuthorizedUser.calledWith(email, password)).to
+        .be.true;
+    });
+  });
 });
