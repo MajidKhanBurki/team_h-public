@@ -72,6 +72,10 @@ class QuizDataService
   async checkQuesAns(subject: string, question: string, userAns: string) {
     return this._mongoQuizData.checkQuesAns(subject, question, userAns);
   }
+
+  async getAuthorizedUser(email: string, password: string) {
+    return this._mongoQuizData.getAuthorizedUser(email, password);
+  }
 }
 
 export const QuizDataServiceInstance = QuizDataService.getSingleton();

@@ -285,6 +285,31 @@ export default class MongoQuizData
     }
   }
 
+  async getAuthorizedUser(email: string, password: string) {
+    const client = new MongoClient(this.uri);
+    var user = null;
+    try {
+      await client.connect();
+
+      user = await client.db("test").collection<Student>("users").findOne({
+        email: email,
+        password: password,
+      });
+      if (user) {
+        // The user object that we have received from the DB
+        return user;
+      } else {
+        // If no user found then return null
+        return null;
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      await client.close();
+      return user;
+    }
+  }
+
   async addUser(name: string, email: string, password: string, role: string) {
     const client = new MongoClient(this.uri);
     var dummyUser = {
