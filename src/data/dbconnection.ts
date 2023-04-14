@@ -1,5 +1,5 @@
-import { MongoClient , InsertOneResult } from "mongodb";
-import Quiz, { UserQuiz , AdminQuizList} from "../business/models/Quiz";
+import { MongoClient, InsertOneResult } from "mongodb";
+import Quiz, { UserQuiz, AdminQuizList } from "../business/models/Quiz";
 import IQuestion from "../business/models/IQuestion";
 import Question from "../business/models/question";
 import Student from "../business/models/Student";
@@ -8,13 +8,15 @@ import IGetQuestionData from "../business/interfaces/IGetQuestionData";
 import IGetUserData from "../business/interfaces/IGetUserData";
 import { ObjectId } from "mongodb";
 
-import Questions from "../business/models/question";
+import Question from "../business/models/question";
 
 /*
  * Concrete class that implements IHandleQuizData and serves up data from MongoDB
  */
-export default class MongoQuizData implements IHandleQuizData, IGetQuestionData, IGetUserData {
-  uri = process.env.MONGODB_URI ??"";
+export default class MongoQuizData
+  implements IHandleQuizData, IGetQuestionData, IGetUserData
+{
+  uri = process.env.MONGODB_URI ?? "";
 
   async findQuiz(id: string) {
     const client = new MongoClient(this.uri);
@@ -90,12 +92,12 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
         .find({})
         .toArray();
 
-      for (const i in quizzes){
+      for (const i in quizzes) {
         let userQuiz = await client
-        .db("test")
-        .collection<Student>("users")
-        .countDocuments({ "quizzes.subject": quizzes[i].subject });
-        quizzes[i].quizTakers = userQuiz
+          .db("test")
+          .collection<Student>("users")
+          .countDocuments({ "quizzes.subject": quizzes[i].subject });
+        quizzes[i].quizTakers = userQuiz;
       }
     } catch (err) {
       console.error(err);
@@ -145,7 +147,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
           subject: quiz.subject,
           name: quiz.name,
           marks: user.quizzes[q].marks,
-          type: quiz.type
+          type: quiz.type,
         } as UserQuiz);
       }
     } catch (err) {
@@ -191,12 +193,14 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
       let results = await questions.find(query).toArray();
       for (let r = 0; r < results.length; r++) {
         const result = results[r];
-        const updatedResults = { ...result, subject: 'null' }; // update the name field
-        await questions.updateOne({ _id: result._id }, { $set: updatedResults }); // update the document in the collection
-        results[r] = updatedResults
+        const updatedResults = { ...result, subject: "null" }; // update the name field
+        await questions.updateOne(
+          { _id: result._id },
+          { $set: updatedResults }
+        ); // update the document in the collection
+        results[r] = updatedResults;
       }
       question = JSON.parse(JSON.stringify(results));
-      
     } catch (err) {
       console.error(err);
     } finally {
@@ -219,8 +223,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
 
       const result = await questions.findOne(query);
       question = JSON.parse(JSON.stringify(result));
-      answer = question?.answer??"";
-
+      answer = question?.answer ?? "";
     } catch (err) {
       console.error(err);
     } finally {
@@ -231,7 +234,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
 
   async findQuestionType(qid: number) {
     const client = new MongoClient(this.uri);
-    
+
     var question: IQuestion | null = null;
     var type: string = "";
     try {
@@ -244,8 +247,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
 
       const result = await questions.findOne(query);
       question = JSON.parse(JSON.stringify(result));
-      type = question?.type??"";
-      
+      type = question?.type ?? "";
     } catch (err) {
       console.error(err);
     } finally {
@@ -266,7 +268,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
       quizzes: [{ subject: "NotFound", marks: 100 }],
     };
 
-    var user: Student = dummyUser
+    var user: Student = dummyUser;
     try {
       await client.connect();
 
@@ -275,7 +277,7 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
           .db("test")
           .collection<Student>("users")
           .findOne({ email: email })) ?? dummyUser;
-    }catch (err) {
+    } catch (err) {
       console.error(err);
     } finally {
       await client.close();
@@ -293,21 +295,29 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
       quizzes: [{ subject: "NotFound", marks: 100 }],
     };
 
-    var user: Student = dummyUser
+    var user: Student = dummyUser;
     var newUser: InsertOneResult<Student>;
     try {
       await client.connect();
-      
-      const data = { name: name, email: email, password: password, role: role, quizzes:[] };
-      newUser =
+
+      const data = {
+        name: name,
+        email: email,
+        password: password,
+        role: role,
+        quizzes: [],
+      };
+      newUser = await client
+        .db("test")
+        .collection<Student>("users")
+        .insertOne(data);
+      const insertedId = newUser.insertedId;
+      user =
         (await client
           .db("test")
           .collection<Student>("users")
-          .insertOne(data));
-      const insertedId = newUser.insertedId;
-      user = await client.db("test").collection<Student>("users").findOne({_id: insertedId}) ?? dummyUser; // get the inserted document using findOne method
-
-    }catch (err) {
+          .findOne({ _id: insertedId })) ?? dummyUser; // get the inserted document using findOne method
+    } catch (err) {
       console.error(err);
     } finally {
       await client.close();
@@ -363,28 +373,27 @@ export default class MongoQuizData implements IHandleQuizData, IGetQuestionData,
       subject: "NotFound",
       type: "NotFound",
     };
-    
-    var _question: Questions = dummyQuestion
-    
+
+    var _question: Question = dummyQuestion;
+
     try {
       await client.connect();
       //first get the quiz subjects that the user has taken. Refer: https://www.mongodb.com/docs/drivers/node/current/fundamentals/crud/read-operations/project/
 
-      _question  =
+      _question =
         (await client
           .db("test")
-          .collection<Questions>("questions")
-          .findOne({ subject: subject , question: question })) ?? dummyQuestion;
-    }catch (err) {
+          .collection<Question>("questions")
+          .findOne({ subject: subject, question: question })) ?? dummyQuestion;
+    } catch (err) {
       console.error(err);
-      return false
+      return false;
     } finally {
       await client.close();
-      if (_question.answer == userAns){
-        return true
-      }
-      else{
-        return false
+      if (_question.answer == userAns) {
+        return true;
+      } else {
+        return false;
       }
     }
   }
