@@ -6,6 +6,8 @@ const { expect } = chai;
 import MongoQuizData from "../src/data/dbconnection";
 import { QuizDataServiceInstance } from "../src/business/services/dbservice";
 import Quiz, { AdminQuizList, UserQuiz } from "../src/business/models/Quiz";
+import Student from "../src/business/models/Student";
+import Question from "../src/business/models/question";
 
 chai.use(sinonChai);
 
@@ -126,6 +128,93 @@ describe("QuizDataServiceInstance", () => {
 
       expect(mongoQuizDataStub.unlinkQuestionFromQuiz.calledWith(subject)).to.be
         .true;
+    });
+  });
+
+  describe("findQuestionAnswer", () => {
+    it("should call findQuestionAnswer with the correct qid", async () => {
+      const qid = 123;
+      const mockResult = "answer";
+      // Stub the findQuestion method and return a predefined result
+      mongoQuizDataStub.findQuestionAnswer.resolves(mockResult);
+
+      await QuizDataServiceInstance.findQuestionAnswer(qid);
+
+      expect(mongoQuizDataStub.findQuestionAnswer.calledWith(qid)).to.be.true;
+    });
+  });
+
+  describe("findQuestionType", () => {
+    it("should call findQuestionType with the correct qid", async () => {
+      const qid = 123;
+      const mockResult = "type";
+      // Stub the findQuestion method and return a predefined result
+      mongoQuizDataStub.findQuestionType.resolves(mockResult);
+
+      await QuizDataServiceInstance.findQuestionType(qid);
+
+      expect(mongoQuizDataStub.findQuestionType.calledWith(qid)).to.be.true;
+    });
+  });
+
+  describe("findUser", () => {
+    it("should call findUser with the correct email", async () => {
+      const email = "adi@adi.com";
+      const mockResult = {
+        name: "string",
+        email: "string",
+        password: "string",
+        role: "string",
+        quizzes: [{ subject: "string", marks: 0 }],
+      } as Student;
+      // Stub the findQuestion method and return a predefined result
+      mongoQuizDataStub.findUser.resolves(mockResult);
+
+      await QuizDataServiceInstance.findUser(email);
+
+      expect(mongoQuizDataStub.findUser.calledWith(email)).to.be.true;
+    });
+  });
+
+  describe("addUser", () => {
+    it("should call addUser with the correct args", async () => {
+      const email = "adi@adi.com";
+      const name = "testUser";
+      const password = "testpassword";
+      const role = "student";
+
+      const mockResult = {
+        name: "string",
+        email: "string",
+        password: "string",
+        role: "string",
+        quizzes: [{ subject: "string", marks: 0 }],
+      } as Student;
+      // Stub the addUser method and return a predefined result
+      mongoQuizDataStub.addUser.resolves(mockResult);
+
+      await QuizDataServiceInstance.addUser(name, email, password, role);
+
+      expect(mongoQuizDataStub.addUser.calledWith(name, email, password, role))
+        .to.be.true;
+    });
+  });
+
+  describe("checkQuesAns", () => {
+    it("should call checkQuesAns with the correct email", async () => {
+      const subject = "Math";
+      const question = "question";
+      const userAns = "userAnswer";
+
+      const mockResult = true;
+      // Stub the checkQuesAns method and return a predefined result
+      mongoQuizDataStub.checkQuesAns.resolves(mockResult);
+
+      await QuizDataServiceInstance.checkQuesAns(subject, question, userAns);
+
+      expect(
+        mongoQuizDataStub.checkQuesAns.calledWith(subject, question, userAns)
+      ).to.be.true;
     });
   });
 });
