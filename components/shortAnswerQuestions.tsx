@@ -23,6 +23,15 @@ import Question from "../src/business/models/question";
 import adminHome from "../pages/admin";
 import { useSession, getSession, signIn, signOut } from "next-auth/react";
 
+/**
+  Function to update the marks in the database.
+  @async
+  @function
+  @param {string} email - The email of the user taking the quiz.
+  @param {string} subject - The subject of the quiz.
+  @param {number} marks - The marks scored by the user.
+  @returns {Promise<void>} Nothing.
+*/
 
 export async function updateMarks(email: string, subject: string, marks: number) {
 
@@ -35,12 +44,12 @@ export async function updateMarks(email: string, subject: string, marks: number)
         "Content-Type": "application/json",
       },
 
-      body: `{"marks": ${marks}, "subject": "${subject}", "email": "${email}" }`, 
+      body: `{"marks": ${marks}, "subject": "${subject}", "email": "${email}" }`,
 
     };
 
     let response = await fetch(`/api/quizes/quizMarks`, options)
-      
+
   } catch (error) {
     console.log("An error occured while updating marks ", error);
   }
@@ -55,7 +64,7 @@ interface ShortAnswerQuestionsProps {
   questions: Question[];
   subjectValue: string;
   emailValue: string;
-  totalMarks:number;
+  totalMarks: number;
 }
 
 /**
@@ -68,10 +77,10 @@ const ITEMS_PER_PAGE = 3;
  * Since the questions for a quizz coming from the questionbank, there id's are not serialized, so added auto incrementing question id using indec variable
  * @returns returns a UI with short answer quizz containing quiz items(question and input for ander) and pagination for easy navigation
  */
-const ShortAnswerQuestions = ({questions,subjectValue,emailValue,totalMarks}:ShortAnswerQuestionsProps)=>{
+const ShortAnswerQuestions = ({ questions, subjectValue, emailValue, totalMarks }: ShortAnswerQuestionsProps) => {
   /**
    * Calculations for pagination
-   */  
+   */
   const [currentPage, setCurrentPage] = useState(0);
   const router = useRouter();
 
@@ -79,12 +88,12 @@ const ShortAnswerQuestions = ({questions,subjectValue,emailValue,totalMarks}:Sho
    * Determining number of pages in total for pagination
    */
 
-  let indexUpdate  = 0; 
+  let indexUpdate = 0;
   const totalPages = Math.ceil(questions.length / ITEMS_PER_PAGE);
   const handlePageClick = ({ selected }: { selected: number }) => {
     indexUpdate = ITEMS_PER_PAGE
     setCurrentPage(selected);
-  
+
   };
   const startIndex = currentPage * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -97,41 +106,44 @@ const ShortAnswerQuestions = ({questions,subjectValue,emailValue,totalMarks}:Sho
     indexUpdate = currentPage * ITEMS_PER_PAGE;
     const { name, value } = event.target;
     const newFormValues = [...formValues];
-    newFormValues[index+ indexUpdate] = { ...newFormValues[index + indexUpdate], [name]: value };
+    newFormValues[index + indexUpdate] = { ...newFormValues[index + indexUpdate], [name]: value };
     setFormValues(newFormValues);
   };
 
   let marks = 0
 
-  
+  /**
+  Function that handles form submission.
+  @param {Object} event - The event object for the form submission.
+  */
   const handleSubmit = (event) => {
-
-    
     event.preventDefault();
-
     let finalArray = []
-    const inputArray = (dict) => {
+    let ansGivenByUserIndexes = []
+    const ansGivenByUser = (dict) => {
+
       for (var key in dict) {
-      if (dict.hasOwnProperty(key)) {
-        console.log(dict[key]);
-        finalArray.push(dict[key])
-      }
-      }
-  }
-  formValues.map(x => inputArray(x))
-
-  let per_question_mark = 0
-  per_question_mark = totalMarks / questions.length
-  per_question_mark.toFixed(2);
-  for (let j = 0; j < finalArray.length; j++){
-    if(questions[j].answer.toLowerCase() == finalArray[j].toLowerCase()){
-              marks = marks + per_question_mark
-          }
+        if (dict.hasOwnProperty(key)) {
+          ansGivenByUserIndexes.push(parseInt(key.match(/\d+/)[0]) - 1);
+          finalArray.push(dict[key]);
         }
+      }
+    }
 
-    updateMarks(emailValue , subjectValue,  Math.floor(marks))
+    formValues.map(x => ansGivenByUser(x))
+    let per_question_mark = 0
+    per_question_mark = totalMarks / questions.length
+    per_question_mark.toFixed(2);
 
-    const myData = { subject: subjectValue, questionCount: questions.length, marks:  Math.floor(marks) }
+    for (let j = 0; j < finalArray.length; j++) {
+      if (questions[ansGivenByUserIndexes[j]].answer.toLowerCase() == finalArray[j].toLowerCase()) {
+        marks = marks + per_question_mark
+      }
+    }
+
+    updateMarks(emailValue, subjectValue, Math.floor(marks))
+
+    const myData = { subject: subjectValue, questionCount: questions.length, marks: Math.floor(marks) }
     router.replace({
       pathname: '/student/quizResult',
       query: { data: JSON.stringify(myData) }
@@ -141,36 +153,36 @@ const ShortAnswerQuestions = ({questions,subjectValue,emailValue,totalMarks}:Sho
 
   return (
     <Flex>
-      <GlobalStyles/>
+      <GlobalStyles />
       <VStack spacing={10} align={"stretch"} justify={"center"}>
         <form action="" method="post" onSubmit={handleSubmit}>
-            {currentQuestions.map((q, index) => (
-              <Box
-                key={q.question}
-                bg="#F2F2E4"
-                p={4}
-                borderRadius="lg"
-                borderWidth="1px"
-                borderColor="gray.200"
-                marginTop={"3"}
-              >
-                <FormControl id="answer">
-                  <FormLabel>
-                    Question {startIndex + index + 1}: {q.question}
-                  </FormLabel>
-                    <Input 
-                      type="text" 
-                      id="answer" 
-                      backgroundColor={"white"} width="50%"
-                      key={index}
-                      name={`input${index}`} // use a unique name for each input
-                      value={q ? q[`input${index}`] : " "} // use the corresponding value from the state
-                      onChange={(event) => handleChange(event, index)}
-                     />
-                </FormControl>
-              </Box>
-            ))}
-          
+          {currentQuestions.map((q, index) => (
+            <Box
+              key={q.question}
+              bg="#F2F2E4"
+              p={4}
+              borderRadius="lg"
+              borderWidth="1px"
+              borderColor="gray.200"
+              marginTop={"3"}
+            >
+              <FormControl id="answer">
+                <FormLabel>
+                  Question {startIndex + index + 1}: {q.question}
+                </FormLabel>
+                <Input
+                  type="text"
+                  id="answer"
+                  backgroundColor={"white"} width="50%"
+                  key={startIndex + index + 1}
+                  name={`input${startIndex + index + 1}`} // use a unique name for each input
+                  value={q ? q[`input${index}`] : String} // use the corresponding value from the state
+                  onChange={(event) => handleChange(event, startIndex + index + 1)}
+                />
+              </FormControl>
+            </Box>
+          ))}
+
           <Flex justifyContent="center" mt={10}>
             <ReactPaginate
               previousLabel={"Previous"}
