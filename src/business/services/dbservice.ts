@@ -53,6 +53,10 @@ class QuizDataService
     return this._mongoQuizData.unlinkQuestionFromQuiz(subject);
   }
 
+  async findQuestionListOfAQuiz(subject: string){
+    return this._mongoQuizData.findQuestionListOfAQuiz(subject);
+  }
+
   async findQuestionAnswer(qid: number) {
     return this._mongoQuizData.findQuestionAnswer(qid);
   }

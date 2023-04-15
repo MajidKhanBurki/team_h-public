@@ -99,6 +99,20 @@ describe("QuizDataServiceInstance", () => {
     });
   });
 
+  describe("findQuestionListOfAQuiz", () => {
+    it("should call findQuestionListOfAQuiz with the correct subject", async () => {
+      const subject = "Math";
+      const mockResult = new Array<Question>();
+      // Stub the findQuestionListOfAQuiz method and return a predefined result
+      mongoQuizDataStub.findQuestionListOfAQuiz.resolves(mockResult);
+
+      await QuizDataServiceInstance.findQuestionListOfAQuiz(subject);
+
+      expect(mongoQuizDataStub.findQuestionListOfAQuiz.calledWith(subject)).to.be
+        .true;
+    });
+  });
+
   describe("findQuestion", () => {
     it("should call findQuestion with the correct qid", async () => {
       const qid = 123;
