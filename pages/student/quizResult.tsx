@@ -88,9 +88,7 @@ export default function QuizResult(quiz: QuizBankProps) {
           </Box>
           <Box flex="1"  mx="auto" justifyContent="center">
                  <Stack  spacing={20} mt={14}  direction='row'>
-                            <Button colorScheme="orange" >Attempt Again </Button>
                             <Button colorScheme="orange" onClick={ handleSubmit } >Main Menu </Button>
-                            <Button colorScheme="orange" >Leaders Board </Button>
                         </Stack>
           </Box>
           <Footer />
