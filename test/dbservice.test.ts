@@ -232,6 +232,20 @@ describe("QuizDataServiceInstance", () => {
     });
   });
 
+  describe("resetUserMarks", () => {
+    it("should call resetUserMarks with the correct email, subject, and marks", async () => {
+      // Stub the resetUserMarks method and return a predefined result
+      mongoQuizDataStub.resetUserMarks.resolves();
+
+      const email = "test@mun.ca"
+      const subject = "test";
+      const marks = 0;
+      await QuizDataServiceInstance.resetUserMarks(email,subject,marks);
+
+      expect(mongoQuizDataStub.resetUserMarks.calledWith(email,subject,marks)).to.be.true;
+    });
+  });
+
   describe("getAuthorizedUser", () => {
     it("should call getAuthorizedUser with the correct email and password", async () => {
       const email = "adi@adi.com";
