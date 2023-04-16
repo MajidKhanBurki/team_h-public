@@ -8,8 +8,6 @@ import IGetQuestionData from "../business/interfaces/IGetQuestionData";
 import IGetUserData from "../business/interfaces/IGetUserData";
 import { ObjectId } from "mongodb";
 
-import Question from "../business/models/question";
-
 /*
  * Concrete class that implements IHandleQuizData and serves up data from MongoDB
  */
@@ -444,5 +442,48 @@ export default class MongoQuizData
       await client.close();
       return questions;
     }
+  }
+
+  /**
+
+Updates the marks of a specific user's quiz
+@async
+@function resetUserMarks
+@param {string} email - Email of the user whose marks are to be updated
+@param {string} subject - Subject of the quiz
+@param {number} marks - New marks to be updated
+@returns {Promise} - Returns a Promise that resolves with the updated post
+@throws {Error} - If an error occurs while updating the marks
+*/
+
+  async resetUserMarks( email:string, subject:string, marks:number){
+    const client = new MongoClient(this.uri);
+    var post;
+    try{
+      await client.connect();
+       post = await client.db("test")
+      .collection("users")
+      .updateOne(
+        { 
+          email:email,
+           "quizzes.subject": subject
+        },
+        {
+          $set: {
+             "quizzes.$.marks": marks  
+          },
+        }
+      );
+
+    }
+    catch(err){
+      console.error(err);
+    }
+    finally {
+      await client.close();
+
+      return post
+    }    
+
   }
 }
