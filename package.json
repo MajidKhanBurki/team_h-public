@@ -25,7 +25,8 @@
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
     "react-paginate": "^8.1.4",
-    "react-router-dom": "^6.8.1"
+    "react-router-dom": "^6.8.1",
+    "sinon-chai": "^3.7.0"
   },
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
@@ -33,6 +34,7 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "18.7.5",
     "@types/react": "16.9.17",
+    "@types/sinon-chai": "^3.2.9",
     "chai": "^4.3.7",
     "mocha": "^10.2.0",
     "mongodb-memory-server": "^8.12.1",

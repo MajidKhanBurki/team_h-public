@@ -4,7 +4,7 @@ import NavBar from "../../../components/studentNavbar";
 import Footer from "../../../components/Footer";
 import ShortAnswerQuestionList from "../../../components/shortAnswerQuestions";
 import { Box, Heading, chakra } from "@chakra-ui/react";
-import MongoQuizData from "../../../src/data/dbconnection";
+import { QuizDataServiceInstance } from "../../../src/business/services/dbservice";
 import Question from "../../../src/business/models/question";
 import { useRouter } from "next/router";
 import { useEffect,useState } from "react";
@@ -22,9 +22,8 @@ export async function getServerSideProps(context) {
   const { subject } = context.query;
   const subjectValue = subject ? subject : ''; //to derive subject value from query parameters and assigning " " as default value
   try {
-    var qd = new MongoQuizData();
-    let questions = await qd.findQuestionListOfAQuiz(subjectValue);
-    const quiz = await qd.findQuiz(subjectValue);
+    let questions = await QuizDataServiceInstance.findQuestionListOfAQuiz(subjectValue);
+    const quiz = await QuizDataServiceInstance.findQuiz(subjectValue);
     const timeValue = quiz?.time;
     const totalMarks = quiz?.maxMarks;
     return {

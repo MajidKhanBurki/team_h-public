@@ -1,7 +1,7 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import clientPromise from "../../../src/lib/mongodb";
+import { QuizDataServiceInstance } from "../../../src/business/services/dbservice";
 
 /**
   Authentication options for NextAuth.JS
@@ -12,7 +12,7 @@ const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   // Configure one or more authentication providers
-  adapter: MongoDBAdapter(clientPromise),
+  adapter: MongoDBAdapter(),
   providers: [
     CredentialsProvider({
       type: "credentials",
@@ -25,17 +25,13 @@ const authOptions: NextAuthOptions = {
        */
 
       async authorize(credentials, req) {
-        const client = await clientPromise;
-        const db = client.db("test");
+
         const { email, password } = credentials as {
           email: string;
           password: string;
         };
 
-        const user = await db.collection("users").findOne({
-          email: email,
-          password: password,
-        });
+        const user = await QuizDataServiceInstance.getAuthorizedUser(email, password)
 
         if (user) {
           // The user object that we have received from the DB

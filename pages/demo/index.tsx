@@ -1,11 +1,10 @@
-import MongoQuizData from "../../src/data/dbconnection";
+import { QuizDataServiceInstance } from "../../src/business/services/dbservice";
 
 export async function getServerSideProps() {
-  var qd = new MongoQuizData();
-  let quizzes = await qd.findAllQuizzes();
+  let quizzes = await QuizDataServiceInstance.findAllQuizzes();
   console.log("All Quizzes retrieved: ", quizzes);
 
-  let oneQuiz = await qd.findQuiz("Math");
+  let oneQuiz = await QuizDataServiceInstance.findQuiz("Math");
   console.log("One Quiz retrieved: ", oneQuiz);
   return {
     props: {}, // will be passed to the page component as props
