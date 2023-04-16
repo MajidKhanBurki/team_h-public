@@ -2,6 +2,7 @@ import MongoQuizData from "../../../src/data/dbconnection";
 import IHandleQuizData from "../../business/interfaces/IHandleQuizData";
 import IGetQuestionData from "../../business/interfaces/IGetQuestionData";
 import IGetUserData from "../../business/interfaces/IGetUserData";
+import { ObjectId } from "mongodb";
 
 class QuizDataService
   implements IHandleQuizData, IGetQuestionData, IGetUserData
@@ -79,6 +80,10 @@ class QuizDataService
 
   async getAuthorizedUser(email: string, password: string) {
     return this._mongoQuizData.getAuthorizedUser(email, password);
+  }
+
+  async resetUserMarks(email:string, subject:string, marks:number){
+    return this._mongoQuizData.resetUserMarks(email, subject,marks);
   }
 }
 
