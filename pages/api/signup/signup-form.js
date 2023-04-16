@@ -1,4 +1,4 @@
-import { QuizDataServiceInstance } from "../../src/business/services/dbservice";
+import { QuizDataServiceInstance } from "../../../src/business/services/dbservice";
 
 export default async (req, res) => {
   try {
