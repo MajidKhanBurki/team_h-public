@@ -12,7 +12,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { AdminQuizList } from "../../src/business/models/Quiz";
-import { QuizDataServiceInstance } from "../../src/business/services/dbservice";
+import { QuizDataServiceInstance } from "../../src/business/services/dbservice"
 
 interface QuizBankProps {
   quizzes: Array<AdminQuizList>;
